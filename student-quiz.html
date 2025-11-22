@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Quiz Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 700px;
+      margin: 20px 0;
+    }
+
+    .topic-select {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      margin-left: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .question {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      width: 100%;
+    }
+
+    .options li {
+      background: #f0f4f8;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      transition: 0.3s;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .options li:hover {
+      transform: scale(1.03);
+      background: #e0f0ff;
+    }
+
+    .options li.correct {
+      background: #d4edda;
+      color: #155724;
+      font-weight: bold;
+      border: 1px solid #28a745;
+    }
+
+    .options li.incorrect {
+      background: #f8d7da;
+      color: #721c24;
+      font-weight: bold;
+      border: 1px solid #dc3545;
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .btn {
+      background: #2575fc;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.3s;
+      margin-right: 5px;
+    }
+
+    .btn:hover {
+      background: #6a11cb;
+      transform: translateY(-3px);
+    }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2575fc;
+    }
+
+    .progress {
+      width: 100%;
+      height: 12px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #2575fc;
+      width: 0%;
+      transition: 0.3s;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .no-questions {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>Student Quiz Portal</header>
+
+  <div class="container">
+    <div class="topic-select">
+      <label for="topic">Choose Subject: &nbsp;</label>
+      <select id="topic"></select>
+    </div>
+    <div class="progress">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div id="quiz-box">
+      <div class="question" id="question"></div>
+      <ul class="options" id="options"></ul>
+      <div class="controls">
+        <button class="btn" id="next-btn">Next</button>
+        <button class="btn" id="refresh-btn">Refresh Quiz</button>
+        <div class="score" id="score"></div>
+      </div>
+    </div>
+  </div>
+
+  <a href="teacher-quiz.html" class="nav-link">Are you a teacher? Go to Teacher Portal</a>
+
+  <script>
+    // Initialize subjects and load questions from localStorage
+    const subjects = [
+      "physics", "chemistry", "mathematics", "biology", 
+      "accountancy", "businessstudies", "economics", "statistics"
+    ];
+
+    // Load questions from localStorage with proper initialization
+    function loadQuestions() {
+      const stored = localStorage.getItem("quizQuestions");
+      if (!stored) {
+        // Initialize with empty arrays for all subjects
+        const initialData = {};
+        subjects.forEach(sub => initialData[sub] = []);
+        localStorage.setItem("quizQuestions", JSON.stringify(initialData));
+        return initialData;
+      }
+      return JSON.parse(stored);
+    }
+
+    let questions = loadQuestions();
+
+    const topicSelect = document.getElementById("topic");
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const scoreEl = document.getElementById("score");
+    const progressBar = document.getElementById("progress-bar");
+
+    let currentTopic, currentIndex = 0, score = 0, answered = false, timerId = null, timerValue = 0;
+
+    // Fill subjects dropdown
+    function fillSubjects() {
+      topicSelect.innerHTML = "";
+      subjects.forEach((sub) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub === "businessstudies" ? "Business Studies" : 
+                         sub.charAt(0).toUpperCase() + sub.slice(1);
+        topicSelect.appendChild(opt);
+      });
+    }
+
+    // Reload questions from localStorage
+    function reloadQuestions() {
+      questions = loadQuestions();
+    }
+
+    // Quiz logic
+    topicSelect.addEventListener("change", () => {
+      reloadQuestions();
+      currentTopic = topicSelect.value;
+      currentIndex = 0;
+      score = 0;
+      scoreEl.textContent = "";
+      progressBar.style.width = "0%";
+      clearTimeout(timerId);
+      loadQuestion();
+    });
+
+    refreshBtn.addEventListener("click", () => {
+      reloadQuestions();
+      currentIndex = 0;
+      score = 0;
+      clearTimeout(timerId);
+      loadQuestion();
+    });
+
+    function updateProgress() {
+      let total = questions[currentTopic].length;
+      let percent = total > 0 ? (currentIndex / total) * 100 : 0;
+      progressBar.style.width = percent + "%";
+    }
+
+    function loadQuestion() {
+      clearTimeout(timerId);
+      reloadQuestions(); // Always reload from localStorage before displaying
+      
+      const qArray = questions[currentTopic];
+      
+      if (!qArray || qArray.length === 0) {
+        questionEl.textContent = "No questions available for " + getSubjectDisplayName(currentTopic);
+        optionsEl.innerHTML = '<div class="no-questions">Please ask your teacher to add questions for this subject.</div>';
+        nextBtn.disabled = true;
+        scoreEl.textContent = "";
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      if (currentIndex >= qArray.length) {
+        currentIndex = 0;
+      }
+
+      const q = qArray[currentIndex];
+      questionEl.textContent = (currentIndex + 1) + ". " + q.question;
+      optionsEl.innerHTML = "";
+      
+      let opts = q.type === "mcq" ? q.options : ["True", "False"];
+      opts.forEach((opt, i) => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        li.addEventListener("click", () => selectOption(li, i));
+        optionsEl.appendChild(li);
+      });
+      
+      answered = false;
+      updateProgress();
+      
+      if (q.timer && q.timer > 0) {
+        timerValue = q.timer;
+        scoreEl.textContent = "Time left: " + timerValue + "s";
+        timerId = setInterval(() => {
+          timerValue--;
+          scoreEl.textContent = "Time left: " + timerValue + "s";
+          if (timerValue <= 0) {
+            clearInterval(timerId);
+            scoreEl.textContent = "Time's up!";
+            answered = true;
+            disableOptions();
+            nextBtn.disabled = false;
+          }
+        }, 1000);
+      } else {
+        scoreEl.textContent = "";
+      }
+      
+      nextBtn.disabled = false;
+    }
+
+    function getSubjectDisplayName(subject) {
+      return subject === "businessstudies" ? "Business Studies" : 
+             subject.charAt(0).toUpperCase() + subject.slice(1);
+    }
+
+    function disableOptions() {
+      optionsEl.querySelectorAll("li").forEach((o) => (o.style.pointerEvents = "none"));
+    }
+
+    function selectOption(li, i) {
+      if (answered) return;
+      answered = true;
+      clearTimeout(timerId);
+      
+      reloadQuestions(); // Ensure we have latest data
+      const q = questions[currentTopic][currentIndex];
+      const allOptions = optionsEl.querySelectorAll("li");
+      
+      disableOptions();
+      
+      if (i === q.answer) {
+        li.classList.add("correct");
+        score++;
+        scoreEl.textContent = "Correct! +1";
+      } else {
+        li.classList.add("incorrect");
+        allOptions[q.answer].classList.add("correct");
+        scoreEl.textContent = "Incorrect!";
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex++;
+      clearTimeout(timerId);
+      
+      reloadQuestions(); // Reload to ensure we have latest questions
+      const qArray = questions[currentTopic];
+      
+      if (currentIndex < qArray.length) {
+        loadQuestion();
+        nextBtn.disabled = false;
+      } else {
+        questionEl.textContent = "Quiz completed for " + getSubjectDisplayName(currentTopic) + "!";
+        optionsEl.innerHTML = "";
+        nextBtn.disabled = true;
+        scoreEl.textContent = "Your Score: " + score + " / " + qArray.length;
+        progressBar.style.width = "100%";
+      }
+    });
+
+    // Initialize on load
+    fillSubjects();
+    currentTopic = topicSelect.value;
+    loadQuestion();
+
+    // Add event listener for storage changes (if teacher adds questions in another tab)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'quizQuestions') {
+        reloadQuestions();
+        loadQuestion();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Photoelectric Effect Simulator - Works Offline">
+    <meta name="theme-color" content="#1e293b">
+    <title>Photoelectric Effect Simulator</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlBob3RvZWxlY3RyaWMgRWZmZWN0IFNpbXVsYXRvciIsCiAgInNob3J0X25hbWUiOiAiUGhvdG9lbGVjdHJpYyIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFlMjkzYiIsCiAgInRoZW1lX2NvbG9yIjogIiMxZTI5M2IiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXhPVElpSUdobGFXZG9kRDBpTVRreUlqNDhjbVZqZENCM2FXUjBhRDBpTVRreUlpQm9aV2xuYUhROUlqRTVNaUlnWm1sc2JEMGlJell3TmpBMk1DSXZQanh3WVhSb0lHUTlJazB4TURBZ05UQmpNQ0F5Tnkwek55QXlOeTAwTUNBME1DMDBNSE14TXkweE15QXpOeTB6TnlBek55QXpOMll5TjJNeU55QXhNeUF6TnlBek55QTBNQ0EwTUhNeE15QXhNeUEwTUNBek55QTBNQzB6TjJNeExURTBMVEV6TFRNM0xUTTNMVE0zZWlJZ1ptbHNiRDBpSXpaa1l6UXlNaUl2UGp3dmMzWm5QZz09IiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fbbf24, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1em;
+        }
+
+        .canvas-container {
+            background: #020617;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #334155;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        #simulationCanvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            display: block;
+            background: #000;
+        }
+
+        .control-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn.start {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .control-btn.stop {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .panels {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #60a5fa;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #cbd5e1;
+        }
+
+        .value-display {
+            color: #fbbf24;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        select, input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #fff;
+        }
+
+        input[type="range"] {
+            height: 8px;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box p {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .measurement-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .measurement {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+        }
+
+        .measurement-label {
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .measurement-value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .status.emitting {
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
+            color: #6ee7b7;
+        }
+
+        .status.not-emitting {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            color: #fca5a5;
+        }
+
+        .graph-container {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #334155;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .graph-container h2 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        #graphCanvas {
+            width: 100%;
+            height: 350px;
+            background: #020617;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .graph-caption {
+            margin-top: 15px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .install-prompt {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .install-prompt.show {
+            display: flex;
+        }
+
+        .install-btn {
+            background: white;
+            color: #1e293b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .install-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .panels {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="install-prompt" id="installPrompt">
+            <span>📱 Install this app for offline use!</span>
+            <button class="install-btn" id="installBtn">Install</button>
+        </div>
+
+        <div class="header">
+            <h1>⚡ Photoelectric Effect Simulator ☀️</h1>
+            <p class="subtitle">Einstein's Photoelectric Equation: KE = hν - φ</p>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="simulationCanvas"></canvas>
+            <button class="control-btn start" id="toggleBtn">Start Simulation</button>
+        </div>
+
+        <div class="panels">
+            <div class="panel">
+                <h2>🎛️ Controls</h2>
+                
+                <div class="control-group">
+                    <label>Metal Type</label>
+                    <select id="metalSelect">
+                        <option value="sodium">Sodium (Na) - φ = 2.3 eV</option>
+                        <option value="potassium">Potassium (K) - φ = 2.0 eV</option>
+                        <option value="cesium">Cesium (Cs) - φ = 1.9 eV</option>
+                        <option value="zinc">Zinc (Zn) - φ = 4.3 eV</option>
+                        <option value="copper">Copper (Cu) - φ = 4.7 eV</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Frequency (ν): 
+                        <span class="value-display" id="freqValue">6.0</span> × 10¹⁴ Hz
+                    </label>
+                    <input type="range" id="freqSlider" min="3" max="12" step="0.1" value="6">
+                    <div class="range-labels">
+                        <span>Low (Red)</span>
+                        <span>High (UV)</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Intensity: 
+                        <span class="value-display" id="intensityValue">50</span>%
+                    </label>
+                    <input type="range" id="intensitySlider" min="10" max="100" step="5" value="50">
+                </div>
+
+                <div class="info-box">
+                    <p>💡 <strong>Key Concept:</strong> Intensity affects the <strong>number</strong> of electrons emitted, while frequency affects their <strong>kinetic energy</strong>.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>📊 Measurements</h2>
+                
+                <div class="measurement-grid">
+                    <div class="measurement">
+                        <div class="measurement-label">Photon Energy (E)</div>
+                        <div class="measurement-value" style="color: #fbbf24;" id="photonEnergy">2.48 eV</div>
+                    </div>
+
+                    <div class="measurement">
+                        <div class="measurement-label">Work Function (φ)</div>
+                        <div class="measurement-value" style="color: #fb923c;" id="workFunction">2.30 eV</div>
+                    </div>
+
+                    <div class="measurement">
+                        <div class="measurement-label">Threshold Frequency (ν₀)</div>
+                        <div class="measurement-value" style="color: #c084fc;" id="thresholdFreq">5.56 × 10¹⁴ Hz</div>
+                    </div>
+
+                    <div class="status emitting" id="emissionStatus">
+                        ✓ EMITTING
+                    </div>
+
+                    <div class="measurement" id="keDisplay">
+                        <div class="measurement-label">Max Kinetic Energy (KE)</div>
+                        <div class="measurement-value" style="color: #22d3ee;" id="kineticEnergy">0.18 eV</div>
+                    </div>
+
+                    <div class="measurement" id="vpDisplay">
+                        <div class="measurement-label">Stopping Potential (V₀)</div>
+                        <div class="measurement-value" style="color: #60a5fa;" id="stoppingPotential">0.18 V</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="graph-container">
+            <h2>📈 Kinetic Energy vs Frequency</h2>
+            <canvas id="graphCanvas"></canvas>
+            <p class="graph-caption">
+                The graph shows a linear relationship: KE = h(ν - ν₀), where slope = h (Planck's constant)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // PWA Installation
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('show');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installPrompt.classList.remove('show');
+            }
+        });
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'photoelectric-v1';
+                self.addEventListener('install', (e) => {
+                    self.skipWaiting();
+                });
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        caches.match(e.request).then(response => response || fetch(e.request))
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        // Constants
+        const h = 4.136e-15; // Planck's constant in eV·s
+        
+        const metals = {
+            sodium: { wf: 2.3, color: '#FFD700' },
+            potassium: { wf: 2.0, color: '#C0C0C0' },
+            cesium: { wf: 1.9, color: '#DDA0DD' },
+            zinc: { wf: 4.3, color: '#B0C4DE' },
+            copper: { wf: 4.7, color: '#B87333' }
+        };
+
+        // State
+        let isAnimating = false;
+        let frequency = 6.0;
+        let intensity = 50;
+        let metalType = 'sodium';
+        let photons = [];
+        let electrons = [];
+
+        // Canvas setup
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 300;
+            graphCanvas.width = graphCanvas.offsetWidth;
+            graphCanvas.height = 350;
+            drawGraph();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // DOM elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const freqSlider = document.getElementById('freqSlider');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const metalSelect = document.getElementById('metalSelect');
+
+        // Event listeners
+        toggleBtn.addEventListener('click', () => {
+            isAnimating = !isAnimating;
+            toggleBtn.textContent = isAnimating ? 'Stop Simulation' : 'Start Simulation';
+            toggleBtn.className = isAnimating ? 'control-btn stop' : 'control-btn start';
+            if (isAnimating) animate();
+        });
+
+        freqSlider.addEventListener('input', (e) => {
+            frequency = parseFloat(e.target.value);
+            document.getElementById('freqValue').textContent = frequency.toFixed(1);
+            updateMeasurements();
+            drawGraph();
+        });
+
+        intensitySlider.addEventListener('input', (e) => {
+            intensity = parseInt(e.target.value);
+            document.getElementById('intensityValue').textContent = intensity;
+        });
+
+        metalSelect.addEventListener('change', (e) => {
+            metalType = e.target.value;
+            updateMeasurements();
+            drawGraph();
+        });
+
+        // Physics calculations
+        function updateMeasurements() {
+            const photonEnergy = h * frequency * 1e14;
+            const workFunction = metals[metalType].wf;
+            const thresholdFreq = workFunction / h / 1e14;
+            const isEmitting = frequency >= thresholdFreq;
+            const ke = isEmitting ? Math.max(0, photonEnergy - workFunction) : 0;
+
+            document.getElementById('photonEnergy').textContent = photonEnergy.toFixed(2) + ' eV';
+            document.getElementById('workFunction').textContent = workFunction.toFixed(2) + ' eV';
+            document.getElementById('thresholdFreq').textContent = thresholdFreq.toFixed(2) + ' × 10¹⁴ Hz';
+            
+            const statusEl = document.getElementById('emissionStatus');
+            const keDisplay = document.getElementById('keDisplay');
+            const vpDisplay = document.getElementById('vpDisplay');
+            
+            if (isEmitting) {
+                statusEl.className = 'status emitting';
+                statusEl.textContent = '✓ EMITTING';
+                keDisplay.style.display = 'block';
+                vpDisplay.style.display = 'block';
+                document.getElementById('kineticEnergy').textContent = ke.toFixed(2) + ' eV';
+                document.getElementById('stoppingPotential').textContent = ke.toFixed(2) + ' V';
+            } else {
+                statusEl.className = 'status not-emitting';
+                statusEl.textContent = '✗ NO EMISSION';
+                keDisplay.style.display = 'none';
+                vpDisplay.style.display = 'none';
+            }
+        }
+
+        // Animation
+        function animate() {
+            if (!isAnimating) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const photonEnergy = h * frequency * 1e14;
+            const workFunction = metals[metalType].wf;
+            const isEmitting = frequency >= workFunction / h / 1e14;
+            const ke = isEmitting ? Math.max(0, photonEnergy - workFunction) : 0;
+
+            // Draw metal surface
+            ctx.fillStyle = metals[metalType].color;
+            ctx.fillRect(canvas.width * 0.65, 0, canvas.width * 0.35, canvas.height);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '16px Arial';
+            ctx.fillText('Metal Surface', canvas.width * 0.7, canvas.height - 15);
+
+            // Create photons
+            if (Math.random() < intensity / 150) {
+                photons.push({
+                    x: 0,
+                    y: Math.random() * canvas.height,
+                    speed: 2 + intensity / 50
+                });
+            }
+
+            // Update and draw photons
+            photons = photons.filter(photon => {
+                photon.x += photon.speed;
+                
+                const hue = 280 - frequency * 20;
+                ctx.beginPath();
+                ctx.arc(photon.x, photon.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+                ctx.fill();
+                
+                // Wave effect
+                ctx.strokeStyle = `hsl(${hue}, 100%, 70%)`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = -20; i < 20; i += 2) {
+                    const wavelength = 200 / frequency;
+                    ctx.lineTo(
+                        photon.x + i,
+                        photon.y + Math.sin((photon.x + i) / wavelength) * 6
+                    );
+                }
+                ctx.stroke();
+
+                // Collision detection
+                if (photon.x >= canvas.width * 0.65) {
+                    if (isEmitting && Math.random() < 0.6) {
+                        electrons.push({
+                            x: canvas.width * 0.65,
+                            y: photon.y,
+                            vx: -(2 + ke * 0.6),
+                            vy: (Math.random() - 0.5) * 2
+                        });
+                    }
+                    return false;
+                }
+                return photon.x < canvas.width;
+            });
+
+            // Update and draw electrons
+            electrons = electrons.filter(electron => {
+                electron.x += electron.vx;
+                electron.y += electron.vy;
+                
+                ctx.beginPath();
+                ctx.arc(electron.x, electron.y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = '#00ffff';
+                ctx.fill();
+                ctx.strokeStyle = '#0088ff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Trail
+                ctx.beginPath();
+                ctx.arc(electron.x + 12, electron.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+                ctx.fill();
+
+                return electron.x > -30;
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        // Graph drawing
+        function drawGraph() {
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            const padding = 60;
+            const graphWidth = graphCanvas.width - padding * 2;
+            const graphHeight = graphCanvas.height - padding * 2;
+            
+            // Background
+            graphCtx.fillStyle = '#020617';
+            graphCtx.fillRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            // Grid
+            graphCtx.strokeStyle = '#334155';
+            graphCtx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const x = padding + (graphWidth / 10) * i;
+                const y = padding + (graphHeight / 10) * i;
+                
+                graphCtx.beginPath();
+                graphCtx.moveTo(x, padding);
+                graphCtx.lineTo(x, padding + graphHeight);
+                graphCtx.stroke();
+                
+                graphCtx.beginPath();
+                graphCtx.moveTo(padding, y);
+                graphCtx.lineTo(padding + graphWidth, y);
+                graphCtx.stroke();
+            }
+            
+            // Axes
+            graphCtx.strokeStyle = '#fff';
+            graphCtx.lineWidth = 2;
+            graphCtx.beginPath();
+            graphCtx.moveTo(padding, padding);
+            graphCtx.lineTo(padding, padding + graphHeight);
+            graphCtx.lineTo(padding + graphWidth, padding + graphHeight);
+            graphCtx.stroke();
+            
+            // Labels
+            graphCtx.fillStyle = '#fff';
+            graphCtx.font = '14px Arial';
+            graphCtx.textAlign = 'center';
+            graphCtx.fillText('Frequency (×10¹⁴ Hz)', graphCanvas.width / 2, graphCanvas.height - 10);
+            
+            graphCtx.save();
+            graphCtx.translate(15, graphCanvas.height / 2);
+            graphCtx.rotate(-Math.PI / 2);
+            graphCtx.fillText('Kinetic Energy (eV)', 0, 0);
+            graphCtx.restore();
+            
+            // Plot data
+            const workFunction = metals[metalType].wf;
+            const thresholdFreq = workFunction / h / 1e14;
+            
+            graphCtx.strokeStyle = '#00ffff';
+            graphCtx.lineWidth = 3;
+            graphCtx.beginPath();
+            
+            for (let f = 3; f <= 12; f += 0.1) {
+                const energy = h * f * 1e14;
+                const ke = Math.max(0, energy - workFunction);
+                
+                const x = padding + ((f - 3) / 9) * graphWidth;
+                const y = padding + graphHeight - (ke / 8) * graphHeight;
+                
+                if (f === 3) {
+                    graphCtx.moveTo(x, y);
+                } else {
+                    graphCtx.lineTo(x, y);
+                }
+            }
+            graphCtx.stroke();
+            
+            // Current point
+            const currentKE = Math.max(0, h * frequency * 1e14 - workFunction);
+            const currentX = padding + ((frequency - 3) / 9) * graphWidth;
+            const currentY = padding + graphHeight - (currentKE / 8) * graphHeight;
+            
+            graphCtx.beginPath();
+            graphCtx.arc(currentX, currentY, 6, 0, Math.PI * 2);
+            graphCtx.fillStyle = '#fbbf24';
+            graphCtx.fill();
+            graphCtx.strokeStyle = '#fff';
+            graphCtx.lineWidth = 2;
+            graphCtx.stroke();
+            
+            // Axis labels
+            graphCtx.fillStyle = '#94a3b8';
+            graphCtx.font = '12px Arial';
+            for (let i = 0; i <= 9; i++) {
+                const freq = 3 + i;
+                const x = padding + (i / 9) * graphWidth;
+                graphCtx.fillText(freq.toString(), x, padding + graphHeight + 20);
+            }
+            
+            for (let i = 0; i <= 8; i++) {
+                const ke = i;
+                const y = padding + graphHeight - (i / 8) * graphHeight;
+                graphCtx.textAlign = 'right';
+                graphCtx.fillText(ke.toString(), padding - 10, y + 5);
+            }
+        }
+
+        // Initialize
+        updateMeasurements();
+        drawGraph();
+    </script>
+</body>
+</html>

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Quiz Portal</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #2c3e50, #3498db);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      padding: 20px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 700px;
+      margin: 20px 0;
+    }
+
+    .teacher-form {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+    }
+
+    select,
+    input,
+    textarea {
+      padding: 10px;
+      font-size: 1rem;
+      width: 100%;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .btn {
+      background: #3498db;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.3s;
+      margin-right: 5px;
+    }
+
+    .btn:hover {
+      background: #2c3e50;
+      transform: translateY(-3px);
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .success {
+      color: green;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+      padding: 10px;
+      background: #d4edda;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+      padding: 10px;
+      background: #f8d7da;
+      border-radius: 5px;
+      width: 100%;
+    }
+
+    .notes-section textarea {
+      height: 100px;
+    }
+
+    .question-list {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .question-list li {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f9f9f9;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      margin-top: 15px;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    h2, h3 {
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    hr {
+      width: 100%;
+      margin: 20px 0;
+      border: 1px solid #eee;
+    }
+
+    .question-count {
+      color: #666;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>Teacher Quiz Portal</header>
+
+  <!-- TEACHER LOGIN -->
+  <div class="container" id="teacher-login-container">
+    <h2>Teacher Login</h2>
+    <form id="teacher-login-form" class="teacher-form">
+      <label>Username</label>
+      <input type="text" id="teacher-username" placeholder="Enter username" required />
+      <label>Password</label>
+      <input type="password" id="teacher-password" placeholder="Enter password" required />
+      <button class="btn" type="submit">Login</button>
+    </form>
+    <div class="error" id="teacher-login-msg"></div>
+  </div>
+
+  <!-- TEACHER PANEL -->
+  <div class="container" id="teacher-container" style="display:none;">
+    <h2>Add New Question</h2>
+    <form class="teacher-form" id="teacher-form">
+      <label>Subject</label>
+      <select id="new-subject"></select>
+      <label>Question Type</label>
+      <select id="question-type">
+        <option value="mcq">Multiple Choice</option>
+        <option value="tf">True / False</option>
+      </select>
+      <label>Question</label>
+      <textarea id="new-question" rows="2" placeholder="Enter your question here..."></textarea>
+      <div id="mcq-options">
+        <label>Option 1</label><input type="text" id="opt1" placeholder="Enter option 1" />
+        <label>Option 2</label><input type="text" id="opt2" placeholder="Enter option 2" />
+        <label>Option 3</label><input type="text" id="opt3" placeholder="Enter option 3" />
+        <label>Option 4</label><input type="text" id="opt4" placeholder="Enter option 4" />
+      </div>
+      <label>Correct Option (1-4 for MCQ, 1=True 2=False for T/F)</label>
+      <input type="number" id="correct" min="1" max="4" placeholder="Enter correct option number" />
+      <label>Enable Timer? (seconds)</label>
+      <input type="number" id="timer" min="0" placeholder="0 = no timer" />
+      <button class="btn" type="submit">Add Question</button>
+    </form>
+    <div class="success" id="teacher-msg"></div>
+
+    <hr />
+
+    <div class="notes-section">
+      <h3>Auto Generate Quiz from Module/Notes</h3>
+      <label>Subject for Generated Quiz</label>
+      <select id="generate-subject"></select>
+      <textarea id="notes-input" placeholder="Paste module content here..."></textarea>
+      <label>Number of Questions to Generate</label>
+      <input type="number" id="num-questions" min="1" value="5" />
+      <button class="btn" id="generate-btn">Generate Quiz</button>
+      <div class="success" id="generate-msg"></div>
+    </div>
+
+    <hr />
+
+    <h3>Manage Questions</h3>
+    <label>Select Subject</label>
+    <select id="manage-subject"></select>
+    <div class="question-count" id="question-count"></div>
+    <ul class="question-list" id="question-list"></ul>
+  </div>
+
+  <a href="student-quiz.html" class="nav-link">Go to Student Portal</a>
+
+  <script>
+    // Initialize subjects
+    const subjects = [
+      "physics", "chemistry", "mathematics", "biology", 
+      "accountancy", "businessstudies", "economics", "statistics"
+    ];
+
+    // Load questions from localStorage with proper initialization
+    function loadQuestions() {
+      const stored = localStorage.getItem("quizQuestions");
+      if (!stored) {
+        // Initialize with empty arrays for all subjects
+        const initialData = {};
+        subjects.forEach(sub => initialData[sub] = []);
+        localStorage.setItem("quizQuestions", JSON.stringify(initialData));
+        return initialData;
+      }
+      return JSON.parse(stored);
+    }
+
+    let questions = loadQuestions();
+
+    const teacherSubject = document.getElementById("new-subject");
+    const generateSubject = document.getElementById("generate-subject");
+    const teacherForm = document.getElementById("teacher-form");
+    const teacherMsg = document.getElementById("teacher-msg");
+    const questionType = document.getElementById("question-type");
+    const mcqOptionsDiv = document.getElementById("mcq-options");
+    const timerInput = document.getElementById("timer");
+    const generateBtn = document.getElementById("generate-btn");
+    const notesInput = document.getElementById("notes-input");
+    const numQuestionsInput = document.getElementById("num-questions");
+    const generateMsg = document.getElementById("generate-msg");
+    const manageSubject = document.getElementById("manage-subject");
+    const questionList = document.getElementById("question-list");
+    const questionCount = document.getElementById("question-count");
+    const teacherLoginContainer = document.getElementById("teacher-login-container");
+    const teacherContainer = document.getElementById("teacher-container");
+
+    // Teacher credentials
+    const teachers = [
+      { username: "malli", password: "pass123" },
+      { username: "teacher2", password: "abc456" },
+    ];
+
+    // Show/hide MCQ fields
+    questionType.addEventListener("change", () => {
+      if (questionType.value === "mcq") {
+        mcqOptionsDiv.style.display = "block";
+        document.getElementById("correct").max = 4;
+      } else {
+        mcqOptionsDiv.style.display = "none";
+        document.getElementById("correct").max = 2;
+      }
+    });
+
+    // Fill dropdowns
+    function fillTeacherSubjects() {
+      teacherSubject.innerHTML = "";
+      subjects.forEach((sub) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub === "businessstudies" ? "Business Studies" : 
+                         sub.charAt(0).toUpperCase() + sub.slice(1);
+        teacherSubject.appendChild(opt);
+      });
+    }
+
+    function fillGenerateSubjects() {
+      generateSubject.innerHTML = "";
+      subjects.forEach((sub) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub === "businessstudies" ? "Business Studies" : 
+                         sub.charAt(0).toUpperCase() + sub.slice(1);
+        generateSubject.appendChild(opt);
+      });
+    }
+
+    function fillManageSubjects() {
+      manageSubject.innerHTML = "";
+      subjects.forEach((sub) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub === "businessstudies" ? "Business Studies" : 
+                         sub.charAt(0).toUpperCase() + sub.slice(1);
+        manageSubject.appendChild(opt);
+      });
+    }
+
+    // Reload questions from localStorage
+    function reloadQuestions() {
+      questions = loadQuestions();
+    }
+
+    // Update question count display
+    function updateQuestionCount(subject) {
+      const count = questions[subject] ? questions[subject].length : 0;
+      questionCount.textContent = `Total questions: ${count}`;
+    }
+
+    // Teacher login
+    const teacherLoginForm = document.getElementById("teacher-login-form");
+    const teacherLoginMsg = document.getElementById("teacher-login-msg");
+
+    teacherLoginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("teacher-username").value.trim();
+      const password = document.getElementById("teacher-password").value.trim();
+      const valid = teachers.find(
+        (t) => t.username === username && t.password === password
+      );
+      if (valid) {
+        teacherLoginMsg.textContent = "Login successful!";
+        teacherLoginMsg.className = "success";
+        teacherLoginContainer.style.display = "none";
+        teacherContainer.style.display = "flex";
+        fillTeacherSubjects();
+        fillGenerateSubjects();
+        fillManageSubjects();
+        reloadQuestions();
+        showQuestionList(manageSubject.value);
+      } else {
+        teacherLoginMsg.textContent = "Invalid username or password!";
+        teacherLoginMsg.className = "error";
+      }
+    });
+
+    // Add question manually
+    teacherForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      reloadQuestions(); // Reload to ensure we have latest data
+      
+      const subject = teacherSubject.value;
+      const type = questionType.value;
+      const newQ = document.getElementById("new-question").value.trim();
+      let opts = [];
+      
+      if (type === "mcq") {
+        opts = [
+          document.getElementById("opt1").value.trim(),
+          document.getElementById("opt2").value.trim(),
+          document.getElementById("opt3").value.trim(),
+          document.getElementById("opt4").value.trim(),
+        ];
+      }
+      
+      const correct = parseInt(document.getElementById("correct").value) - 1;
+      const timerVal = parseInt(timerInput.value) || 0;
+      
+      // Validation
+      if (!newQ) {
+        teacherMsg.textContent = "Please enter a question.";
+        teacherMsg.className = "error";
+        return;
+      }
+      
+      if (type === "mcq" && opts.some((o) => o === "")) {
+        teacherMsg.textContent = "Please fill all MCQ options.";
+        teacherMsg.className = "error";
+        return;
+      }
+      
+      if (isNaN(correct) || correct < 0 || (type === "mcq" && correct > 3) || (type === "tf" && correct > 1)) {
+        teacherMsg.textContent = "Please enter a valid correct option.";
+        teacherMsg.className = "error";
+        return;
+      }
+      
+      if (type === "tf") {
+        opts = ["True", "False"];
+      }
+      
+      // Initialize subject array if it doesn't exist
+      if (!questions[subject]) {
+        questions[subject] = [];
+      }
+      
+      // Add the question
+      questions[subject].push({
+        question: newQ,
+        options: opts,
+        answer: correct,
+        type: type,
+        timer: timerVal,
+      });
+      
+      // Save to localStorage
+      localStorage.setItem("quizQuestions", JSON.stringify(questions));
+      
+      teacherMsg.textContent = "Question added successfully! Students can now see this question.";
+      teacherMsg.className = "success";
+      teacherForm.reset();
+      
+      // Update the question list
+      showQuestionList(subject);
+      manageSubject.value = subject;
+      updateQuestionCount(subject);
+    });
+
+    // Auto-generate questions
+    generateBtn.addEventListener("click", () => {
+      reloadQuestions();
+      
+      const notes = notesInput.value.trim();
+      const subject = generateSubject.value;
+      let num = parseInt(numQuestionsInput.value) || 5;
+      
+      if (!notes) {
+        generateMsg.textContent = "Please enter module content.";
+        generateMsg.className = "error";
+        return;
+      }
+      
+      // Initialize subject array if it doesn't exist
+      if (!questions[subject]) {
+        questions[subject] = [];
+      }
+      
+      let words = notes
+        .split(/\s+/)
+        .map((w) => w.replace(/[^a-zA-Z]/g, ""))
+        .filter((w) => w.length > 3);
+      
+      let uniqueWords = [...new Set(words)];
+      let sentences = notes
+        .split(/[\.\?\!]/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 20);
+      
+      let generated = 0;
+      while (generated < num && sentences.length > 0) {
+        let idx = Math.floor(Math.random() * sentences.length);
+        let sentence = sentences[idx];
+        sentences.splice(idx, 1);
+        let sentWords = sentence.split(/\s+/);
+        let keyword = null;
+        
+        for (let w of sentWords) {
+          let clean = w.replace(/[^a-zA-Z]/g, "");
+          if (uniqueWords.includes(clean) && clean.length > 4) {
+            keyword = clean;
+            break;
+          }
+        }
+        
+        if (!keyword) continue;
+        
+        let qText = sentence.replace(keyword, "_____");
+        let correct = keyword;
+        let opts = [correct];
+        
+        while (opts.length < 4) {
+          let w = uniqueWords[Math.floor(Math.random() * uniqueWords.length)];
+          if (!opts.includes(w)) opts.push(w);
+        }
+        
+        opts.sort(() => Math.random() - 0.5);
+        let ansIndex = opts.indexOf(correct);
+        
+        questions[subject].push({
+          question: qText,
+          options: opts,
+          answer: ansIndex,
+          type: "mcq",
+          timer: 0,
+        });
+        
+        generated++;
+      }
+      
+      localStorage.setItem("quizQuestions", JSON.stringify(questions));
+      generateMsg.textContent = generated + " questions generated successfully! Students can now see these questions.";
+      generateMsg.className = "success";
+      notesInput.value = "";
+      numQuestionsInput.value = 5;
+      
+      // Update the question list
+      showQuestionList(subject);
+      manageSubject.value = subject;
+      updateQuestionCount(subject);
+    });
+
+    // Manage questions
+    function showQuestionList(sub) {
+      reloadQuestions(); // Reload to ensure we have latest data
+      questionList.innerHTML = "";
+      
+      if (!questions[sub] || questions[sub].length === 0) {
+        questionList.innerHTML = '<li style="text-align: center; color: #666; font-style: italic;">No questions yet for this subject.</li>';
+        updateQuestionCount(sub);
+        return;
+      }
+      
+      questions[sub].forEach((q, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <div style="flex: 1;">
+            <strong>Q${i + 1}:</strong> ${q.question}<br>
+            <small>Type: ${q.type.toUpperCase()} | Correct: Option ${q.answer + 1}</small>
+          </div>
+          <button class="btn btn-danger" onclick="removeQuestion('${sub}', ${i})" style="padding: 5px 10px; font-size: 0.8rem;">Remove</button>
+        `;
+        questionList.appendChild(li);
+      });
+      
+      updateQuestionCount(sub);
+    }
+
+    manageSubject.addEventListener("change", () => {
+      showQuestionList(manageSubject.value);
+    });
+
+    function removeQuestion(sub, index) {
+      if (confirm("Are you sure you want to remove this question?")) {
+        reloadQuestions();
+        questions[sub].splice(index, 1);
+        localStorage.setItem("quizQuestions", JSON.stringify(questions));
+        showQuestionList(sub);
+      }
+    }
+
+    // Initialize on load
+    fillTeacherSubjects();
+    fillGenerateSubjects();
+    fillManageSubjects();
+    
+    // Make removeQuestion function available globally
+    window.removeQuestion = removeQuestion;
+  </script>
+</body>
+</html>
