@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Rural Diploma Virtual Classroom</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* (All your original CSS unchanged) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            font-size: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+        
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            background: #ff6b6b;
+            top: 10%;
+            left: 10%;
+            border-radius: 50%;
+            animation-delay: 0s;
+        }
+        
+        .shape:nth-child(2) {
+            width: 100px;
+            height: 100px;
+            background: #4ecdc4;
+            top: 70%;
+            left: 80%;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation-delay: -5s;
+        }
+        
+        .shape:nth-child(3) {
+            width: 120px;
+            height: 120px;
+            background: #ffe66d;
+            top: 20%;
+            left: 80%;
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            animation-delay: -10s;
+        }
+        
+        .shape:nth-child(4) {
+            width: 60px;
+            height: 60px;
+            background: #ff9ff3;
+            top: 80%;
+            left: 20%;
+            border-radius: 50%;
+            animation-delay: -15s;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+            100% {
+                transform: translateY(0) rotate(360deg);
+            }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            font-weight: 300;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff6b6b, #ff9ff3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .bandwidth-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .bandwidth-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4cd964;
+            animation: pulse 2s infinite;
+        }
+        
+        .bandwidth-dot.medium { background: #ffcc00; }
+        .bandwidth-dot.low { background: #ff3b30; }
+        
+        .offline-indicator {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: #ff3b30;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: none;
+            z-index: 1001;
+            animation: slideInRight 0.5s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        
+        .offline-indicator.show {
+            display: block;
+        }
+        
+        .login-container, .dashboard {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #f8f9fa;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-type-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .user-type-btn.active {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
+        }
+        
+        .user-type-btn:hover {
+            background: #4b7688;
+            color: white;
+        }
+        
+        .login-form {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .form-group small {
+            font-size: 12px;
+            color: #28a745;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-family: inherit;
+            background: white;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(30, 60, 114, 0.5);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #f0f0f0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: #1e3c72;
+        }
+        
+        .feature-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .bandwidth-optimized {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .data-saver { background: #17a2b8; }
+        .offline-ready { background: #ffc107; color: #333; }
+        
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 28px;
+            cursor: pointer;
+            color: white;
+            background: none;
+            border: none;
+        }
+        
+        .close-btn:hover {
+            opacity: 0.7;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container { 
+                padding: 15px; 
+            }
+            
+            .dashboard-grid { 
+                grid-template-columns: 1fr 1fr; 
+                gap: 15px; 
+            }
+            
+            .feature-card { 
+                padding: 20px; 
+            }
+            
+            .feature-card .icon { 
+                font-size: 2.5rem; 
+            }
+            
+            .feature-card h3 { 
+                font-size: 16px; 
+            }
+            
+            .feature-card p { 
+                font-size: 13px; 
+            }
+            
+            .modal-content { 
+                width: 98%; 
+                margin: 1%; 
+            }
+            
+            .header h1 { 
+                font-size: 2rem; 
+            }
+            
+            .user-info { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 15px; 
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-grid { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+            }
+            
+            .user-type-selector { 
+                flex-direction: column; 
+            }
+            
+            .user-type-btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .bandwidth-indicator {
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+            
+            .offline-indicator {
+                font-size: 11px;
+                padding: 8px 12px;
+            }
+        }
+        
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Jitsi container styling */
+        #jitsiContainer {
+            width: 100%;
+            height: 70vh;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .jitsi-controls {
+            display:flex;
+            gap:10px;
+            align-items:center;
+            margin-bottom:15px;
+        }
+
+        .jitsi-controls .small {
+            padding:8px 12px;
+            border-radius:8px;
+            border:1px solid #ddd;
+            background:#f7f7f7;
+            cursor:pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <!-- Connection Status Indicators -->
+    <div class="bandwidth-indicator" id="bandwidthIndicator">
+        <div class="bandwidth-dot" id="bandwidthDot"></div>
+        <span id="bandwidthText">Auto-Optimizing...</span>
+    </div>
+    
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi"></i> Offline Mode Active
+    </div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Rural Diploma Virtual Classroom</h1>
+            <p class="subtitle">Low-Bandwidth Optimized Learning Platform</p>
+            <p class="subtitle">Expert Faculty for AI • VLSI • Renewable Energy • Advanced Technologies</p>
+            <div class="badge">Innovation in Rural Education</div>
+        </div>
+        
+        <!-- Login Section -->
+        <div class="login-container" id="loginSection">
+            <div class="user-type-selector">
+                <button class="user-type-btn active" onclick="switchUserType('student')">
+                    <i class="fas fa-user-graduate"></i> Diploma Student
+                </button>
+                <button class="user-type-btn" onclick="switchUserType('faculty')">
+                    <i class="fas fa-chalkboard-teacher"></i> Expert Faculty
+                </button>
+                <button class="user-type-btn" onclick="switchUserType('admin')">
+                    <i class="fas fa-user-tie"></i> College Admin
+                </button>
+            </div>
+            
+            <!-- Student Login Form -->
+            <form id="studentLoginForm" class="login-form">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> College Registration Number</label>
+                    <input type="text" id="studentId" placeholder="Demo: DIP2024001" required>
+                    <small>Try: DIP2024001, DIP2024002, or DIP2024003</small>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="studentPassword" placeholder="Demo: student123" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Specialization</label>
+                    <select id="studentSpecialization" required>
+                        <option value="">Select your branch</option>
+                        <option value="artificial-intelligence">Artificial Intelligence & ML</option>
+                        <option value="vlsi">VLSI Design & Technology</option>
+                        <option value="renewable-energy">Renewable Energy Systems</option>
+                        <option value="robotics">Robotics & Automation</option>
+                        <option value="iot">IoT & Embedded Systems</option>
+                        <option value="cybersecurity">Cybersecurity</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Year</label>
+                    <select id="studentYear" required>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-rocket"></i> Join Virtual Classroom</button>
+            </form>
+            
+            <!-- Faculty Login Form -->
+            <form id="facultyLoginForm" class="login-form hidden">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Faculty ID</label>
+                    <input type="text" id="facultyId" placeholder="Demo: EXPERT001" required>
+                    <small>Try: EXPERT001, EXPERT002, or EXPERT003</small>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="facultyPassword" placeholder="Demo: faculty123" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Expertise Area</label>
+                    <select id="facultyExpertise" required>
+                        <option value="artificial-intelligence">AI & Machine Learning</option>
+                        <option value="vlsi">VLSI & Chip Design</option>
+                        <option value="renewable-energy">Renewable Energy</option>
+                        <option value="robotics">Robotics & Automation</option>
+                        <option value="multiple">Multiple Specializations</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Teaching Location</label>
+                    <select id="facultyLocation">
+                        <option value="remote">Remote (City-based)</option>
+                        <option value="onsite">On-campus</option>
+                        <option value="hybrid">Hybrid Mode</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Start Teaching Session</button>
+            </form>
+            
+            <!-- Admin Login Form -->
+            <form id="adminLoginForm" class="login-form hidden">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> Admin ID</label>
+                    <input type="text" id="adminId" placeholder="Demo: ADMIN001" required>
+                    <small>Try: ADMIN001 or ADMIN002</small>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="adminPassword" placeholder="Demo: admin123" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-university"></i> College</label>
+                    <select id="adminCollege">
+                        <option value="rural-tech-diploma">Rural Technical Diploma College</option>
+                        <option value="village-polytechnic">Village Polytechnic Institute</option>
+                        <option value="district-diploma">District Diploma College</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-tachometer-alt"></i> Access Admin Panel</button>
+            </form>
+        </div>
+        
+        <!-- Student Dashboard -->
+        <div class="dashboard hidden" id="studentDashboard">
+            <div class="user-info">
+                <div>
+                    <h3>Welcome, <span id="studentName">Student</span>! <i class="fas fa-user-graduate"></i></h3>
+                    <div class="connection-status">
+                        <div class="status-dot" id="connectionDot"></div>
+                        <span>Connection: <span id="connectionType">Auto</span> • Data Saved: <span id="dataSaved">0MB</span></span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="feature-card" onclick="startLiveSession()">
+                    <div class="icon"><i class="fas fa-video"></i></div>
+                    <span class="bandwidth-optimized">Low-Band</span>
+                    <h3>Live Expert Sessions</h3>
+                    <p>Audio-first lectures from city experts. Works on 2G! Auto-quality adjustment.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Recorded sessions would open here')">
+                    <div class="icon"><i class="fas fa-film"></i></div>
+                    <span class="bandwidth-optimized data-saver">Data-Saver</span>
+                    <h3>Compressed Recordings</h3>
+                    <p>Download lectures in 8-50MB sizes. Multiple quality options available.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Quiz feature would open here')">
+                    <div class="icon"><i class="fas fa-pencil-alt"></i></div>
+                    <h3>Interactive Quizzes</h3>
+                    <p>Take quizzes to test your knowledge with instant feedback.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Chatbot would open here')">
+                    <div class="icon"><i class="fas fa-robot"></i></div>
+                    <h3>AI Learning Assistant</h3>
+                    <p>Ask questions and get instant help with your studies.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('VLSI simulation would open here')">
+                    <div class="icon"><i class="fas fa-microchip"></i></div>
+                    <h3>VLSI Lab Simulation</h3>
+                    <p>Run virtual VLSI experiments with detailed analysis.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Progress tracking would open here')">
+                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    <span class="bandwidth-optimized offline-ready">Offline</span>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor your learning progress across all subjects.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Faculty Dashboard -->
+        <div class="dashboard hidden" id="facultyDashboard">
+            <div class="user-info">
+                <div>
+                    <h3>Expert Faculty - <span id="facultyName">Dr. Expert</span> <i class="fas fa-chalkboard-teacher"></i></h3>
+                    <div class="connection-status">
+                        <div class="status-dot"></div>
+                        <span>Teaching from <span id="facultyLoc">City</span> • Students served: <span id="studentsServed">0</span></span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> End Session</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="feature-card" onclick="startLiveSession(true)">
+                    <div class="icon"><i class="fas fa-broadcast-tower"></i></div>
+                    <span class="bandwidth-optimized">Low-Band</span>
+                    <h3>Start Live Session</h3>
+                    <p>Begin teaching with auto-optimized streaming for rural students.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Content upload would open here')">
+                    <div class="icon"><i class="fas fa-upload"></i></div>
+                    <span class="bandwidth-optimized data-saver">Compress</span>
+                    <h3>Upload & Compress</h3>
+                    <p>Upload lectures with auto-compression to 8-50MB sizes.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Student analytics would open here')">
+                    <div class="icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3>Student Analytics</h3>
+                    <p>View student performance and engagement metrics.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Assignment management would open here')">
+                    <div class="icon"><i class="fas fa-tasks"></i></div>
+                    <h3>Assignment Manager</h3>
+                    <p>Create, distribute and grade assignments efficiently.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Resource library would open here')">
+                    <div class="icon"><i class="fas fa-book-open"></i></div>
+                    <h3>Resource Library</h3>
+                    <p>Access and share teaching materials with students.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Schedule would open here')">
+                    <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                    <h3>Session Scheduler</h3>
+                    <p>Plan and schedule future teaching sessions.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Admin Dashboard -->
+        <div class="dashboard hidden" id="adminDashboard">
+            <div class="user-info">
+                <div>
+                    <h3>College Admin - <span id="adminName">Admin</span> <i class="fas fa-user-tie"></i></h3>
+                    <div class="connection-status">
+                        <div class="status-dot"></div>
+                        <span><span id="collegeName">College</span> • Active Students: <span id="activeStudents">0</span></span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+            
+            <div class="dashboard-grid">
+                <div class="feature-card" onclick="showNotification('Faculty management would open here')">
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <h3>Expert Faculty Network</h3>
+                    <p>Connect with city-based experts. Schedule sessions for specialized subjects.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Bandwidth analytics would open here')">
+                    <div class="icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <h3>Bandwidth Analytics</h3>
+                    <p>Monitor campus connectivity. Optimize content delivery for your network.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Content management would open here')">
+                    <div class="icon"><i class="fas fa-book"></i></div>
+                    <h3>Content Library</h3>
+                    <p>Manage AI, VLSI, Renewable Energy curricula. Track usage analytics.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Student analytics would open here')">
+                    <div class="icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Student Progress</h3>
+                    <p>Track learning outcomes across all specializations and years.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('Cost analysis would open here')">
+                    <div class="icon"><i class="fas fa-money-bill-wave"></i></div>
+                    <h3>Cost Analytics</h3>
+                    <p>Monitor costs and ROI. Compare with traditional hiring.</p>
+                </div>
+                
+                <div class="feature-card" onclick="showNotification('System settings would open here')">
+                    <div class="icon"><i class="fas fa-cogs"></i></div>
+                    <h3>System Configuration</h3>
+                    <p>Configure bandwidth limits, quality settings, offline sync policies.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Features (reused for Jitsi too) -->
+    <div class="modal" id="featureModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Feature</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Dedicated Modal for Live Session (Jitsi) -->
+    <div class="modal" id="jitsiModal">
+        <div class="modal-content" style="max-width:1100px; height:90vh; display:flex; flex-direction:column;">
+            <div class="modal-header" style="border-radius:20px 20px 0 0; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; flex-direction:column;">
+                    <h3 id="jitsiTitle">Live Session</h3>
+                    <small id="jitsiSubtitle" style="opacity:0.9;">Join a live, low-bandwidth session — audio-first by default</small>
+                </div>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input id="roomInput" style="padding:8px 10px; border-radius:8px; border:none; width:240px;" />
+                    <button class="close-btn" onclick="endJitsiSession()" title="End meeting" style="background:none; color:white; border:none; font-size:18px;">&times;</button>
+                </div>
+            </div>
+
+            <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; height:100%; padding:16px;">
+                <div class="jitsi-controls">
+                    <button id="joinBtn" class="small" onclick="joinJitsi()">Join</button>
+                    <button id="leaveBtn" class="small hidden" onclick="endJitsiSession()">Leave</button>
+                    <label style="margin-left:8px; font-size:13px;">
+                        <input type="checkbox" id="videoToggle" /> Enable video
+                    </label>
+                    <label style="margin-left:8px; font-size:13px;">
+                        <input type="checkbox" id="audioOnlyToggle" /> Audio-only (saves data)
+                    </label>
+                    <div style="margin-left:auto; font-size:13px; color:#666;">
+                        Bandwidth: <strong id="jitsiBandwidthDisplay">Auto</strong>
+                    </div>
+                </div>
+
+                <div id="jitsiContainer"></div>
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px;">
+                    <button class="btn" style="width:auto;" onclick="toggleJitsiAudio()">Toggle Mute</button>
+                    <button class="btn" style="width:auto;" onclick="toggleJitsiVideo()">Toggle Video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Fixed & preserved app JS (with template string fixes) ---
+        // Global variables
+        let currentUser = null;
+        let isOnline = navigator.onLine;
+        let bandwidthQuality = 'auto';
+        let dataSaved = 0;
+        
+        // Jitsi variables
+        let jitsiAPI = null;
+        let jitsiDomain = 'meet.jit.si'; // public Jitsi server (you can change to your own)
+        let jitsiRoom = null;
+
+        // Sample user database for demo
+        const sampleUsers = {
+            students: {
+                'DIP2024001': { 
+                    password: 'student123', 
+                    name: 'Rajesh Kumar', 
+                    specialization: 'artificial-intelligence',
+                    year: 2,
+                    college: 'Rural Tech Diploma College'
+                },
+                'DIP2024002': { 
+                    password: 'student123', 
+                    name: 'Priya Sharma', 
+                    specialization: 'vlsi',
+                    year: 3,
+                    college: 'Village Polytechnic Institute'
+                },
+                'DIP2024003': { 
+                    password: 'student123', 
+                    name: 'Amit Singh', 
+                    specialization: 'renewable-energy',
+                    year: 1,
+                    college: 'District Diploma College'
+                }
+            },
+            faculty: {
+                'EXPERT001': { 
+                    password: 'faculty123', 
+                    name: 'Dr. Amit Verma', 
+                    expertise: 'artificial-intelligence',
+                    location: 'Mumbai',
+                    experience: '10+ years in AI/ML'
+                },
+                'EXPERT002': { 
+                    password: 'faculty123', 
+                    name: 'Prof. Sunita Reddy', 
+                    expertise: 'vlsi',
+                    location: 'Bangalore',
+                    experience: '8+ years in VLSI Design'
+                },
+                'EXPERT003': { 
+                    password: 'faculty123', 
+                    name: 'Dr. Kavita Singh', 
+                    expertise: 'renewable-energy',
+                    location: 'Delhi',
+                    experience: '12+ years in Renewable Energy'
+                }
+            },
+            admin: {
+                'ADMIN001': { 
+                    password: 'admin123', 
+                    name: 'Dr. Ramesh Patel', 
+                    college: 'Rural Tech Diploma College',
+                    role: 'Principal'
+                },
+                'ADMIN002': { 
+                    password: 'admin123', 
+                    name: 'Prof. Maya Gupta', 
+                    college: 'Village Polytechnic Institute',
+                    role: 'Academic Coordinator'
+                }
+            }
+        };
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            detectBandwidth();
+            initializeOfflineSupport();
+            setupEventListeners();
+            startBandwidthMonitoring();
+            showWelcomeMessage();
+        });
+        
+        // Event listeners setup
+        function setupEventListeners() {
+            // Form submissions
+            document.getElementById('studentLoginForm').addEventListener('submit', handleStudentLogin);
+            document.getElementById('facultyLoginForm').addEventListener('submit', handleFacultyLogin);
+            document.getElementById('adminLoginForm').addEventListener('submit', handleAdminLogin);
+            
+            // Network status monitoring
+            window.addEventListener('online', handleOnlineStatus);
+            window.addEventListener('offline', handleOfflineStatus);
+        }
+        
+        // Bandwidth detection and optimization
+        function detectBandwidth() {
+            const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            
+            if (connection) {
+                const effectiveType = connection.effectiveType;
+                
+                let quality = 'high';
+                let dotClass = '';
+                let statusText = 'Optimizing...';
+                
+                if (effectiveType === 'slow-2g' || effectiveType === '2g') {
+                    quality = 'ultra-low';
+                    dotClass = 'low';
+                    statusText = '2G Detected';
+                } else if (effectiveType === '3g') {
+                    quality = 'low';
+                    dotClass = 'medium';
+                    statusText = '3G Detected';
+                } else if (effectiveType === '4g') {
+                    quality = 'medium';
+                    dotClass = '';
+                    statusText = '4G Available';
+                } else {
+                    quality = 'high';
+                    dotClass = '';
+                    statusText = 'High Speed';
+                }
+                
+                bandwidthQuality = quality;
+                updateBandwidthIndicator(statusText, dotClass);
+                optimizeForBandwidth(quality);
+            } else {
+                performSpeedTest();
+            }
+        }
+        
+        function performSpeedTest() {
+            const startTime = Date.now();
+            const testImage = new Image();
+            
+            testImage.onload = function() {
+                const loadTime = Date.now() - startTime;
+                
+                if (loadTime > 3000) {
+                    bandwidthQuality = 'ultra-low';
+                    updateBandwidthIndicator('2G Speed', 'low');
+                } else if (loadTime > 1500) {
+                    bandwidthQuality = 'low';
+                    updateBandwidthIndicator('3G Speed', 'medium');
+                } else {
+                    bandwidthQuality = 'medium';
+                    updateBandwidthIndicator('Good Speed', '');
+                }
+                
+                optimizeForBandwidth(bandwidthQuality);
+            };
+            
+            testImage.onerror = function() {
+                bandwidthQuality = 'ultra-low';
+                updateBandwidthIndicator('Limited Connection', 'low');
+                optimizeForBandwidth('ultra-low');
+            };
+            
+            testImage.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><rect width="1" height="1" fill="white"/></svg>?' + Math.random();
+        }
+        
+        function updateBandwidthIndicator(text, dotClass) {
+            const dot = document.getElementById('bandwidthDot');
+            const textSpan = document.getElementById('bandwidthText');
+            
+            if (dot) {
+                // reset classes
+                dot.className = 'bandwidth-dot';
+                if (dotClass === 'medium') dot.classList.add('medium');
+                if (dotClass === 'low') dot.classList.add('low');
+            }
+            if (textSpan) {
+                textSpan.textContent = text;
+            }
+            // show short label in jitsi modal if present
+            const jitsiDisplay = document.getElementById('jitsiBandwidthDisplay');
+            if (jitsiDisplay) {
+                jitsiDisplay.textContent = text;
+            }
+        }
+        
+        function optimizeForBandwidth(quality) {
+            console.log(`Optimizing for ${quality} bandwidth`);
+            
+            switch(quality) {
+                case 'ultra-low':
+                    dataSaved += 25;
+                    break;
+                case 'low':
+                    dataSaved += 15;
+                    break;
+                case 'medium':
+                    dataSaved += 5;
+                    break;
+                default:
+                    // high or auto
+                    dataSaved += 1;
+                    break;
+            }
+            
+            updateDataSavedIndicator();
+        }
+        
+        function updateDataSavedIndicator() {
+            const indicator = document.getElementById('dataSaved');
+            if (indicator) {
+                indicator.textContent = `${dataSaved}MB`;
+            }
+        }
+        
+        function startBandwidthMonitoring() {
+            setInterval(() => {
+                detectBandwidth();
+            }, 30000); // Check every 30 seconds
+        }
+        
+        // User type switching
+        function switchUserType(type) {
+            const buttons = document.querySelectorAll('.user-type-btn');
+            const forms = document.querySelectorAll('.login-form');
+            
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+            // Hide all forms
+            forms.forEach(form => form.classList.add('hidden'));
+            
+            // Activate clicked button
+            // if event is undefined (called programmatically), fallback to first matching
+            let clicked = null;
+            try {
+                clicked = event.target;
+            } catch(e) {
+                // no-op
+            }
+            if (clicked) clicked.classList.add('active');
+            else {
+                // fallback: activate correct button by type
+                buttons.forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes(type)) btn.classList.add('active');
+                });
+            }
+            
+            // Show corresponding form
+            switch(type) {
+                case 'student':
+                    document.getElementById('studentLoginForm').classList.remove('hidden');
+                    break;
+                case 'faculty':
+                    document.getElementById('facultyLoginForm').classList.remove('hidden');
+                    break;
+                case 'admin':
+                    document.getElementById('adminLoginForm').classList.remove('hidden');
+                    break;
+            }
+        }
+        
+        // Login handlers
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('studentId').value;
+            const password = document.getElementById('studentPassword').value;
+            const specialization = document.getElementById('studentSpecialization').value;
+            const year = document.getElementById('studentYear').value;
+            
+            if (sampleUsers.students[id] && sampleUsers.students[id].password === password) {
+                currentUser = {
+                    type: 'student',
+                    ...sampleUsers.students[id],
+                    specialization: specialization || sampleUsers.students[id].specialization,
+                    year: year || sampleUsers.students[id].year
+                };
+                showStudentDashboard();
+            } else {
+                alert('Invalid credentials! Demo credentials:\n\nDIP2024001/student123\nDIP2024002/student123\nDIP2024003/student123');
+            }
+        }
+        
+        function handleFacultyLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('facultyId').value;
+            const password = document.getElementById('facultyPassword').value;
+            const expertise = document.getElementById('facultyExpertise').value;
+            const location = document.getElementById('facultyLocation').value;
+            
+            if (sampleUsers.faculty[id] && sampleUsers.faculty[id].password === password) {
+                currentUser = {
+                    type: 'faculty',
+                    ...sampleUsers.faculty[id],
+                    expertise: expertise || sampleUsers.faculty[id].expertise,
+                    location: location || sampleUsers.faculty[id].location
+                };
+                showFacultyDashboard();
+            } else {
+                alert('Invalid credentials! Demo credentials:\n\nEXPERT001/faculty123\nEXPERT002/faculty123\nEXPERT003/faculty123');
+            }
+        }
+        
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('adminId').value;
+            const password = document.getElementById('adminPassword').value;
+            const college = document.getElementById('adminCollege').value;
+            
+            if (sampleUsers.admin[id] && sampleUsers.admin[id].password === password) {
+                currentUser = {
+                    type: 'admin',
+                    ...sampleUsers.admin[id],
+                    college: college || sampleUsers.admin[id].college
+                };
+                showAdminDashboard();
+            } else {
+                alert('Invalid credentials! Demo credentials:\n\nADMIN001/admin123\nADMIN002/admin123');
+            }
+        }
+        
+        // Dashboard display functions
+        function showStudentDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.remove('hidden');
+            document.getElementById('studentName').textContent = currentUser.name;
+            updateConnectionStatus();
+            
+            setTimeout(() => {
+                showNotification(`Welcome ${currentUser.name}! Your ${currentUser.specialization.replace('-', ' ')} curriculum is ready.`);
+            }, 1000);
+            
+            startStudentNotifications();
+        }
+        
+        function showFacultyDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('facultyDashboard').classList.remove('hidden');
+            document.getElementById('facultyName').textContent = currentUser.name;
+            document.getElementById('facultyLoc').textContent = currentUser.location || 'Remote';
+            document.getElementById('studentsServed').textContent = Math.floor(Math.random() * 200 + 50);
+            
+            setTimeout(() => {
+                showNotification(`Welcome ${currentUser.name}! Ready to teach ${currentUser.expertise.replace('-', ' ')} to rural students.`);
+            }, 1000);
+            
+            startFacultyNotifications();
+        }
+        
+        function showAdminDashboard() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminDashboard').classList.remove('hidden');
+            document.getElementById('adminName').textContent = currentUser.name;
+            document.getElementById('collegeName').textContent = currentUser.college;
+            document.getElementById('activeStudents').textContent = Math.floor(Math.random() * 300 + 100);
+            
+            setTimeout(() => {
+                showNotification(`Welcome ${currentUser.name}! Monitor and optimize learning outcomes.`);
+            }, 1000);
+            
+            startAdminNotifications();
+        }
+        
+        function updateConnectionStatus() {
+            const connectionType = document.getElementById('connectionType');
+            const dataSavedSpan = document.getElementById('dataSaved');
+            
+            if (connectionType) {
+                connectionType.textContent = bandwidthQuality === 'ultra-low' ? '2G' : 
+                                           bandwidthQuality === 'low' ? '3G' : 
+                                           bandwidthQuality === 'medium' ? '4G' : 'High Speed';
+            }
+            
+            if (dataSavedSpan) {
+                dataSavedSpan.textContent = `${dataSaved}MB`;
+            }
+        }
+        
+        // Network status handlers
+        function handleOnlineStatus() {
+            isOnline = true;
+            const indicator = document.getElementById('offlineIndicator');
+            if (indicator) {
+                indicator.classList.remove('show');
+            }
+            syncOfflineData();
+        }
+        
+        function handleOfflineStatus() {
+            isOnline = false;
+            const indicator = document.getElementById('offlineIndicator');
+            if (indicator) {
+                indicator.classList.add('show');
+            }
+        }
+        
+        function initializeOfflineSupport() {
+            if ('serviceWorker' in navigator) {
+                console.log('Service Worker support detected - offline features enabled');
+            }
+        }
+        
+        function syncOfflineData() {
+            console.log('Syncing offline data...');
+            if (Math.random() > 0.7) {
+                setTimeout(() => {
+                    showNotification('Offline data synced successfully!');
+                }, 2000);
+            }
+        }
+        
+        // Utility functions
+        function showModal(title, content) {
+            const modal = document.getElementById('featureModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalBody) modalBody.innerHTML = content;
+            if (modal) modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('featureModal');
+            if (modal) modal.style.display = 'none';
+        }
+        
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.querySelectorAll('.dashboard').forEach(dashboard => {
+                dashboard.classList.add('hidden');
+            });
+            
+            // Reset forms
+            document.getElementById('studentLoginForm').reset();
+            document.getElementById('facultyLoginForm').reset();
+            document.getElementById('adminLoginForm').reset();
+            
+            // Reset user type selector
+            const buttons = document.querySelectorAll('.user-type-btn');
+            const forms = document.querySelectorAll('.login-form');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            forms.forEach(form => form.classList.add('hidden'));
+            
+            buttons[0].classList.add('active'); // Activate first button
+            document.getElementById('studentLoginForm').classList.remove('hidden');
+            
+            showNotification('Logged out successfully. Thank you!');
+        }
+        
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px;
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                color: white; padding: 15px 20px; border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 2000;
+                max-width: 300px; font-size: 14px; line-height: 1.4;
+                animation: slideInRight 0.5s ease-out; cursor: pointer;
+                display: flex; align-items: center; gap: 10px;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-info-circle"></i>
+                <div style="flex: 1;">${message}</div>
+                <i class="fas fa-times" style="opacity: 0.7;"></i>
+            `;
+            
+            notification.onclick = () => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            };
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+        
+        function showWelcomeMessage() {
+            setTimeout(() => {
+                showNotification('Welcome to Rural Diploma Virtual Classroom!');
+            }, 2000);
+            
+            setTimeout(() => {
+                showNotification('Bandwidth auto-optimized for your connection. Try the demo login credentials!');
+            }, 8000);
+        }
+        
+        function startStudentNotifications() {
+            setTimeout(() => {
+                showNotification('New lecture available for download (8MB audio version)');
+            }, 10000);
+            
+            setTimeout(() => {
+                showNotification('Expert consultation slots available - book now!');
+            }, 20000);
+        }
+        
+        function startFacultyNotifications() {
+            setTimeout(() => {
+                showNotification('3 students have booked consultation sessions');
+            }, 12000);
+            
+            setTimeout(() => {
+                showNotification('Last session had 96% attendance - great engagement!');
+            }, 22000);
+        }
+        
+        function startAdminNotifications() {
+            setTimeout(() => {
+                showNotification('Student engagement up 23% this week');
+            }, 15000);
+            
+            setTimeout(() => {
+                showNotification('Bandwidth costs optimized - significant savings achieved');
+            }, 25000);
+        }
+
+        // -----------------------
+        // JITSI INTEGRATION CODE
+        // -----------------------
+
+        // Dynamically load Jitsi external_api.js when needed
+        function loadJitsiScript(callback) {
+            if (window.JitsiMeetExternalAPI) {
+                return callback();
+            }
+            const existing = document.getElementById('jitsiScript');
+            if (existing) {
+                existing.onload = callback;
+                return;
+            }
+            const script = document.createElement('script');
+            script.id = 'jitsiScript';
+            script.src = `https://${jitsiDomain}/external_api.js`;
+            script.async = true;
+            script.onload = callback;
+            script.onerror = () => {
+                showNotification('Failed to load video conferencing engine. Please check network or use audio-only.');
+            };
+            document.head.appendChild(script);
+        }
+
+        // Open the Jitsi modal and prepare room name
+        function startLiveSession(forceAsHost=false) {
+            // Ensure user logged in to join easily
+            if (!currentUser) {
+                showNotification('Please login first to join a live session.');
+                return;
+            }
+
+            // choose default room (editable)
+            const baseRoom = `${(currentUser.college || 'RuralCollege').replace(/\s+/g,'')}-${currentUser.type || 'user'}-${(currentUser.name || 'guest').replace(/\s+/g,'')}`.toLowerCase();
+            const timestamp = Date.now().toString().slice(-5);
+            const defaultRoom = `${baseRoom}-${timestamp}`;
+
+            document.getElementById('roomInput').value = defaultRoom;
+            document.getElementById('jitsiModal').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Live Session (Jitsi)';
+            // Set audio-only toggle default based on bandwidthQuality
+            const audioToggle = document.getElementById('audioOnlyToggle');
+            if (bandwidthQuality === 'ultra-low' || bandwidthQuality === 'low') {
+                audioToggle.checked = true;
+                document.getElementById('videoToggle').checked = false;
+            } else {
+                audioToggle.checked = false;
+            }
+
+            // update display
+            const jitsiDisplay = document.getElementById('jitsiBandwidthDisplay');
+            if (jitsiDisplay) jitsiDisplay.textContent = bandwidthQuality;
+
+            // Preload script — actual join happens when user clicks Join (safer for data)
+            loadJitsiScript(() => {
+                // script loaded; join button will create instance
+                showNotification('Jitsi ready. Click Join to enter the session.');
+            });
+
+            // If faculty clicked Start Live Session (force host), auto-join
+            if (forceAsHost) {
+                // small delay so modal appears
+                setTimeout(() => {
+                    joinJitsi();
+                }, 700);
+            }
+        }
+
+        // Create & join Jitsi meeting
+        function joinJitsi() {
+            const room = document.getElementById('roomInput').value.trim();
+            if (!room) {
+                showNotification('Please enter a room name.');
+                return;
+            }
+            jitsiRoom = room;
+            const container = document.getElementById('jitsiContainer');
+            container.innerHTML = ''; // clear
+
+            // show leave button, hide join
+            document.getElementById('joinBtn').classList.add('hidden');
+            document.getElementById('leaveBtn').classList.remove('hidden');
+
+            loadJitsiScript(() => {
+                if (!window.JitsiMeetExternalAPI) {
+                    showNotification('Video engine not available.');
+                    return;
+                }
+
+                // Determine initial options from bandwidth and toggles
+                const audioOnly = document.getElementById('audioOnlyToggle').checked;
+                const enableVideo = document.getElementById('videoToggle').checked && !audioOnly;
+
+                // Basic configOverwrite and interfaceConfigOverwrite for low bandwidth
+                const configOverwrite = {
+                    startWithAudioMuted: false,
+                    startWithVideoMuted: !enableVideo,
+                    enableLayerSuspension: true,
+                    // prefer H264 to save CPU/bandwidth on some devices
+                    useStunTurn: true
+                };
+
+                // Constraints for low bandwidth: limit video resolution
+                const interfaceConfigOverwrite = {
+                    MOBILE_APP_PROMO: false,
+                    SHOW_JITSI_WATERMARK: false,
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'hangup', 'chat', 'raisehand', 'tileview'
+                    ]
+                };
+
+                const parentNode = container;
+                const domain = jitsiDomain;
+                const options = {
+                    roomName: room,
+                    width: '100%',
+                    height: parentNode.clientHeight || 600,
+                    parentNode,
+                    configOverwrite,
+                    interfaceConfigOverwrite,
+                    userInfo: {
+                        displayName: currentUser ? currentUser.name : 'Guest'
+                    }
+                };
+
+                // Create instance
+                try {
+                    jitsiAPI = new JitsiMeetExternalAPI(domain, options);
+
+                    // Apply audio-only preferences after api is ready
+                    if (audioOnly) {
+                        // Turn off video track(s)
+                        jitsiAPI.executeCommand('toggleVideo'); // attempt to mute video
+                        // On some browsers you might need to mute or set low constraints
+                    }
+
+                    // Reduce resolution if low bandwidth
+                    if (bandwidthQuality === 'ultra-low' || bandwidthQuality === 'low') {
+                        // Request low quality (the exact API to enforce encodings requires server-level config)
+                        // we try to set preferred resolution via setReceiverVideoConstraint (client-side hint)
+                        try {
+                            jitsiAPI.setReceiverVideoConstraint(180); // small height
+                        } catch (e) { /* ignore if unsupported */ }
+                    }
+
+                    // Bind events to update UI
+                    jitsiAPI.addEventListener('videoConferenceJoined', (event) => {
+                        showNotification('You joined the live session.');
+                        document.getElementById('jitsiTitle').textContent = `Live Session - ${room}`;
+                    });
+
+                    jitsiAPI.addEventListener('readyToClose', () => {
+                        // user clicked hangup inside Jitsi UI
+                        endJitsiSession();
+                    });
+
+                    // store mute state easily accessible
+                    jitsiAPI.isAudioMuted = function() {
+                        try { return jitsiAPI.isMuted(); } catch(e){ return false; }
+                    };
+
+                } catch (err) {
+                    console.error('Failed to create Jitsi API', err);
+                    showNotification('Could not start meeting: ' + (err && err.message ? err.message : 'unknown error'));
+                    // revert join/leave UI
+                    document.getElementById('joinBtn').classList.remove('hidden');
+                    document.getElementById('leaveBtn').classList.add('hidden');
+                }
+            });
+        }
+
+        // End / dispose Jitsi session
+        function endJitsiSession() {
+            if (jitsiAPI) {
+                try {
+                    jitsiAPI.dispose();
+                } catch(e) {
+                    // ignore
+                }
+                jitsiAPI = null;
+            }
+            const container = document.getElementById('jitsiContainer');
+            if (container) container.innerHTML = '';
+
+            // hide modal
+            const modal = document.getElementById('jitsiModal');
+            if (modal) modal.style.display = 'none';
+
+            // reset join/leave UI
+            document.getElementById('joinBtn').classList.remove('hidden');
+            document.getElementById('leaveBtn').classList.add('hidden');
+
+            showNotification('Left the live session.');
+        }
+
+        // Toggle audio/video controls (buttons in the modal)
+        function toggleJitsiAudio() {
+            if (!jitsiAPI) {
+                showNotification('Not connected to a live session.');
+                return;
+            }
+            try {
+                jitsiAPI.executeCommand('toggleAudio');
+            } catch (e) {
+                showNotification('Unable to toggle audio.');
+            }
+        }
+
+        function toggleJitsiVideo() {
+            if (!jitsiAPI) {
+                showNotification('Not connected to a live session.');
+                return;
+            }
+            try {
+                jitsiAPI.executeCommand('toggleVideo');
+            } catch (e) {
+                showNotification('Unable to toggle video.');
+            }
+        }
+
+        // helper that faculty can click from dashboard to start as host
+        // (we already wired feature-card to startLiveSession or startLiveSession(true))
+        // when starting as host we auto-join and show controls.
+
+        // Update UI toggles if user toggles audioOnly/Video checkbox BEFORE join
+        document.addEventListener('change', function(e) {
+            if (!e.target) return;
+            if (e.target.id === 'audioOnlyToggle') {
+                if (e.target.checked) {
+                    // disable video toggle
+                    document.getElementById('videoToggle').checked = false;
+                    document.getElementById('videoToggle').disabled = true;
+                } else {
+                    document.getElementById('videoToggle').disabled = false;
+                }
+            }
+        });
+
+        // Hide modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const fm = document.getElementById('featureModal');
+            if (fm && fm.style.display === 'block' && e.target === fm) fm.style.display = 'none';
+
+            const jm = document.getElementById('jitsiModal');
+            if (jm && e.target === jm) {
+                // do not auto-close jitsi to avoid accidental leaves, so ignore
+            }
+        });
+
+    </script>
+</body>
+</html>
